@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import './Chat.css';
 import ChatHeader from "./ChatHeader";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
@@ -25,7 +25,7 @@ function Chat() {
             db.collection("channels")
                 .doc(channelId)
                 .collection('messages')
-                .orderBy('timestamp','desc')
+                .orderBy('timestamp','asc')
                 .onSnapshot((snapshot =>
                         setMessages(snapshot.docs.map((doc) => doc.data()))
 
@@ -44,11 +44,16 @@ function Chat() {
         setInput('')
 
     }
-
+    const chatBox = useRef()
+    const AlwaysScrollToBottom = () => {
+        const elementRef = useRef();
+        useEffect(() => elementRef.current.scrollIntoView());
+        return <div ref={elementRef} />;
+    };
     return(
         <div className='chat'>
             <ChatHeader channelName={channelName}/>
-            <div className='chat_messages'>
+            <div className='chat_messages' ref={chatBox}>
                 {
                     messages.map((message) => (
                         <Message
@@ -59,6 +64,7 @@ function Chat() {
                         />
                     ))
                 }
+                <AlwaysScrollToBottom />
             </div>
 
             <div className='chat_input'>
